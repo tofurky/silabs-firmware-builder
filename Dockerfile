@@ -200,3 +200,4 @@ ENV PATH="$PATH:/root/.silabs/slt/bin"
 WORKDIR /repo
 
 ENTRYPOINT ["/opt/venv/bin/python3", "tools/build_project.py"]
+
