@@ -1,3 +1,6 @@
+# SL-OPENTHREAD/2.7.3.0_GitHub-fb0446f53
+This beta release is built with Simplicity SDK 2025.6.3.
+
 # SL-OPENTHREAD/2.7.2.0_GitHub-fb0446f53
 This beta release is built with Simplicity SDK 2025.6.2.
 
