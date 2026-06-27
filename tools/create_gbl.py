@@ -317,12 +317,21 @@ def main():
             (gsdk_path / "platform/bootloader/config/btl_config.h").read_text()
         )
 
-        # Look for overrides
+        # Look for overrides in the generated project config
         btl_core_config_h = parse_c_header_defines(
             (project_root / "config/btl_core_cfg.h").read_text()
         )
 
         btl_config = dict(btl_config_h)
+
+        # Apply patched SDK btl_config.h on top (may override MAJOR/MINOR via sdk_patches)
+        for patched_btl_config in sorted(
+            project_root.glob("gecko_sdk_*/platform/bootloader/config/btl_config.h")
+        ):
+            btl_config.update(parse_c_header_defines(patched_btl_config.read_text()))
+            break
+
+        # btl_core_cfg.h has highest priority (config patcher values win over everything)
         btl_config.update(btl_core_config_h)
 
         metadata["gecko_bootloader_version"] = ".".join(

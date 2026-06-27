@@ -10,7 +10,16 @@ gbl:
   gecko_bootloader_version: dynamic
   baudrate: 115200
 
+# A bootloader posted to OpenWrt forum bumped the major version from 2 to 3.
+# Anti-rollback prevents flashing the 2.x bootloaders that current SDKs
+# produce, there's no guard on the defines, meaning we must patch the SDK
+# to builder a bootloader with a higher version that can be flashed over it.
+sdk_patches:
+  - btl_config_version_override.patch
+
 c_defines:
+  BOOTLOADER_VERSION_MAIN_CUSTOMER: 4
+
   SL_SERIAL_UART_FLOW_CONTROL: 0
 
   SL_SERIAL_UART_PERIPHERAL: USART0
