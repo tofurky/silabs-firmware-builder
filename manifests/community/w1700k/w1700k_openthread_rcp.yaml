@@ -1,0 +1,28 @@
+name: Gemtek MXF-W1700K OpenThread RCP
+device: EFR32MG21A010F512IM32
+base_project: src/openthread_rcp
+filename: "{manifest_name}_{ot_rcp_version.split('/')[-1]}_gsdk_{sdk_version}"
+sdk: "simplicity_sdk:2026.6.1"
+toolchain: "14.2.1.20241119"
+
+gbl:
+  fw_type: openthread_rcp
+  ot_rcp_version: dynamic
+  baudrate: 460800
+
+add_components:
+- id: iostream_usart
+  instance: [vcom]
+
+c_defines:
+  SL_IOSTREAM_USART_VCOM_PERIPHERAL: USART0
+  SL_IOSTREAM_USART_VCOM_PERIPHERAL_NO: 0
+  SL_IOSTREAM_USART_VCOM_BAUDRATE: 460800
+  SL_IOSTREAM_USART_VCOM_FLOW_CONTROL_TYPE: usartHwFlowControlNone
+  SL_IOSTREAM_USART_VCOM_TX_PORT: SL_GPIO_PORT_A
+  SL_IOSTREAM_USART_VCOM_TX_PIN:  5
+  SL_IOSTREAM_USART_VCOM_RX_PORT: SL_GPIO_PORT_A
+  SL_IOSTREAM_USART_VCOM_RX_PIN:  6
+
+  #                            G     E     M     T     E     K     M     X     F     -     W     1     7     0     0     K
+  SL_APPLICATION_PRODUCT_ID: '{0x47, 0x45, 0x4d, 0x54, 0x45, 0x4b, 0x4d, 0x58, 0x46, 0x2d, 0x57, 0x31, 0x37, 0x30, 0x30, 0x4b}'

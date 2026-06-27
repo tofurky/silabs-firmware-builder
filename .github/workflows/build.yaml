@@ -217,7 +217,7 @@ jobs:
           persist-credentials: false
       - id: set-matrix
         run: |
-          echo "matrix=$(find manifests -type f \( -name "*.yaml" -o -name "*.yml" \) -print | sort | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          echo "matrix=$(find manifests/community -type f \( -name "*.yaml" -o -name "*.yml" \) -print | sort | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
 
   build-firmwares:
     name: Firmware builder
@@ -335,7 +335,7 @@ jobs:
   sync-releases-branch:
     name: Sync releases branch
     needs: [release-assets]
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' && github.repository == 'NabuCasa/silabs-firmware-builder'
     runs-on: ubuntu-latest
     permissions:
       contents: write
