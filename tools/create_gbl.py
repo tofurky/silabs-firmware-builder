@@ -334,7 +334,9 @@ def main():
     if "gecko_bootloader_version" in gbl_dynamic:
         gbl_dynamic.remove("gecko_bootloader_version")
         btl_config_h = parse_c_header_defines(
-            (gsdk_path / "platform/bootloader/config/btl_config.h").read_text()
+            next(
+                project_root.glob("*sdk_*/**/platform/bootloader/config/btl_config.h")
+            ).read_text()
         )
 
         # Look for overrides
