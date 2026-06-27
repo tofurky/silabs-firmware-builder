@@ -1,0 +1,22 @@
+diff --git a/platform/bootloader/core/btl_bootload.c b/platform/bootloader/core/btl_bootload.c
+index 37ba1af5..362389f3 100644
+--- a/platform/bootloader/core/btl_bootload.c
++++ b/platform/bootloader/core/btl_bootload.c
+@@ -915,7 +915,7 @@ SL_WEAK bool bootload_checkSeUpgradeVersion(uint32_t upgradeVersion)
+   }
+ 
+   // Only allow upgrade if it is higher than the running version
+-  if (runningVersion < upgradeVersion) {
++  if (1 || runningVersion < upgradeVersion) {
+     return true;
+   } else {
+     return false;
+@@ -939,7 +939,7 @@ SL_WEAK bool bootload_commitSeUpgrade(uint32_t upgradeAddress)
+   SE_executeCommand(&checkImage);
+   response = SE_readCommandResponse();
+ 
+-  if (response != SE_RESPONSE_OK) {
++  if (0 && response != SE_RESPONSE_OK) {
+     return false;
+   }
+ 

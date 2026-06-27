@@ -1,0 +1,15 @@
+diff --git a/platform/bootloader/config/btl_config.h b/platform/bootloader/config/btl_config.h
+index 8cd75133..c365cd3e 100644
+--- a/platform/bootloader/config/btl_config.h
++++ b/platform/bootloader/config/btl_config.h
+@@ -20,8 +20,8 @@
+ //
+ // Bootloader Version
+ //
+-#define BOOTLOADER_VERSION_MAIN_MAJOR             2
+-#define BOOTLOADER_VERSION_MAIN_MINOR             4
++#define BOOTLOADER_VERSION_MAIN_MAJOR             3
++#define BOOTLOADER_VERSION_MAIN_MINOR             1
+ 
+ #include "core/btl_util.h"
+ MISRAC_DISABLE
