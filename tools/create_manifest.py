@@ -12,7 +12,15 @@ import re
 import sys
 from datetime import UTC, datetime
 
-from pygbl import GBLError, parse_firmware_image
+from pygbl import (
+    FirmwareImage,
+    GBL3Header,
+    GBL3Image,
+    GBL3Type,
+    GBLError,
+    parse_firmware_image,
+    read_encryption_key,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,6 +65,24 @@ def get_firmware_version(metadata: dict) -> str | None:
     return metadata[version_key]
 
 
+def maybe_decrypt_firmware(firmware: FirmwareImage, keys: list[bytes]) -> FirmwareImage:
+    """Decrypt an encrypted image to access metadata."""
+    if not isinstance(firmware, GBL3Image):
+        return firmware
+
+    if GBL3Type.ENCRYPTION_AESCCM not in firmware.get_first_tag(GBL3Header).type:
+        return firmware
+
+    # The image does not identify its key, so every key is tried until one decrypts
+    for key in keys:
+        try:
+            return firmware.decrypt(key)
+        except GBLError:
+            continue
+
+    raise ValueError("Image is encrypted, pass a matching --encryption-key")
+
+
 def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -71,8 +97,18 @@ def main():
         type=pathlib.Path,
         help="Directory containing the source tree to identify changelogs",
     )
+    parser.add_argument(
+        "--encryption-key",
+        type=pathlib.Path,
+        action="append",
+        default=[],
+        help="Path to an image encryption key token file, for encrypted GBL files. Can be passed more than once",
+    )
 
     args = parser.parse_args()
+
+    keys = [read_encryption_key(p.read_text()) for p in args.encryption_key]
+
     manifest = {
         "metadata": {
             "created_at": datetime.now(UTC).isoformat(),
@@ -90,8 +126,7 @@ def main():
             _LOGGER.warning("Ignoring invalid firmware file: %s", firmware_file)
             continue
 
-        # Encrypted images keep their metadata inside the ciphertext, so it is absent
-        raw_metadata = firmware.get_metadata()
+        raw_metadata = maybe_decrypt_firmware(firmware, keys).get_metadata()
         metadata = json.loads(raw_metadata) if raw_metadata is not None else None
 
         manifest["firmwares"].append(
