@@ -24,6 +24,12 @@ from pygbl import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# A firmware's `fw_type` names its source directory, except where the two have drifted
+SOURCE_DIRS = {
+    "gecko-bootloader": "bootloader",
+    "zwave_ncp": "zwa2_controller",
+}
+
 
 def parse_markdown_changelog(text: str) -> list[dict[str, str | None]]:
     """Parse a changelog into an ordered list of entries, newest first."""
@@ -149,7 +155,10 @@ def main():
             continue
 
         fw_type = fw["metadata"]["fw_type"]
-        changelog_md = args.source_dir / fw_type / "CHANGELOG.md"
+
+        changelog_md = (
+            args.source_dir / SOURCE_DIRS.get(fw_type, fw_type) / "CHANGELOG.md"
+        )
 
         if fw_type not in changelogs:
             if changelog_md.exists():
