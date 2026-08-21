@@ -288,8 +288,9 @@ jobs:
 
       - name: Generate manifest
         run: |
-          /opt/venv/bin/python3 tools/create_manifest.py artifacts src \
-            --encryption-key src/zwa2_controller/keys/vendor_encrypt.key \
+          /opt/venv/bin/python3 -m tools.create_manifest \
+            --manifests manifests \
+            --artifacts artifacts \
             > artifacts/manifest.json
 
       - name: Upload artifact
