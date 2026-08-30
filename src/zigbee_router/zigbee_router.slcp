@@ -19,6 +19,9 @@ sdk_extension:
   - id: router_bootloader_cli
     vendor: nabucasa
     version: 1.0.0
+  - id: router_dlk_override
+    vendor: tofurky
+    version: 1.0.0
 
 component:
   - id: sl_main
@@ -57,6 +60,7 @@ component:
   - id: zigbee_security_link_keys
   - id: clock_manager
   - id: zigbee_dynamic_commissioning
+  - id: router_dlk_override
   - id: zigbee_trust_center_keepalive
   - id: zigbee_poll_control_client
   - id: zigbee_bdb_3dot1_rejoin_algorithm

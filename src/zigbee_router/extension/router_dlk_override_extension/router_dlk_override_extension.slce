@@ -1,0 +1,5 @@
+id: router_dlk_override
+vendor: tofurky
+version: "1.0.0"
+component_path:
+  - path: "./"
