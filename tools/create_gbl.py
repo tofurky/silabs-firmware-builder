@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import json
 import pathlib
+import struct
 from typing import Any
 
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -243,3 +244,33 @@ def create_gbl(
     elf.with_suffix(".gbl").write_bytes(image.serialize(block_size=4))
 
     return metadata
+
+
+def create_ota(gbl_path: pathlib.Path, ota_metadata: dict[str, Any]) -> pathlib.Path:
+    """Wrap a GBL image in a Zigbee OTA upgrade container (.ota)."""
+    gbl_bytes = gbl_path.read_bytes()
+
+    header_len = 56
+    sub_element_header_len = 6
+    total_size = header_len + sub_element_header_len + len(gbl_bytes)
+
+    header_str = ota_metadata.get("header_string", "").encode("ascii")[:32].ljust(32, b"\x00")
+    ota_header = struct.pack(
+        "<IHHHHHIH32sIHI",
+        0x0BEEF11E,  # OTA upgrade file identifier
+        0x0100,  # OTA header version
+        header_len,
+        0x0000,  # OTA header field control
+        int(ota_metadata["manufacturer_id"]),
+        int(ota_metadata["image_type"]),
+        int(ota_metadata["file_version"]),
+        int(ota_metadata.get("stack_version", 0x0002)),
+        header_str,
+        total_size,
+        0x0000,  # Upgrade Image sub-element tag ID
+        len(gbl_bytes),
+    )
+
+    ota_path = gbl_path.with_suffix(".ota")
+    ota_path.write_bytes(ota_header + gbl_bytes)
+    return ota_path

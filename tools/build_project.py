@@ -23,7 +23,7 @@ from datetime import UTC, datetime
 from elftools.elf.elffile import ELFFile
 from ruamel.yaml import YAML
 
-from .create_gbl import create_gbl
+from .create_gbl import create_gbl, create_ota
 
 LOGGER = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ def parse_prefixed_output(output: str) -> tuple[str, pathlib.Path | None]:
         prefix = output
         path = None
 
-    if prefix not in ("gbl", "hex", "out"):
+    if prefix not in ("gbl", "hex", "ota", "out"):
         raise argparse.ArgumentTypeError(
             "Output format is of the form `gbl:overridden_filename.gbl` or just `gbl`"
         )
@@ -1270,6 +1270,8 @@ def main() -> None:
     )
 
     output_artifact = (build.cmake_dir / build.base_project_name).with_suffix(".gbl")
+    if "ota" in build.manifest.config:
+        create_ota(output_artifact, build.manifest.config["ota"])
     verify_build_reproducibility(build, output_artifact)
 
     base_filename = build.manifest.output_stem(
@@ -1286,6 +1288,14 @@ def main() -> None:
         shutil.copy(
             src=output_artifact.with_suffix(f".{extension}"),
             dst=args.output_dir / output_path,
+        )
+
+    if "ota" in build.manifest.config and not any(
+        ext == "ota" for ext, _ in args.outputs
+    ):
+        shutil.copy(
+            src=output_artifact.with_suffix(".ota"),
+            dst=args.output_dir / f"{base_filename}.ota",
         )
 
     if args.clean_build_dir:

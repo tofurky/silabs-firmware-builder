@@ -1,0 +1,37 @@
+id: router_status_led_button
+label: Router Status LED and Reset/Pairing Button
+package: custom
+description: >
+  Status LED and reset/pairing button handler for Zigbee routers with a single
+  GPIO status LED and button (e.g. Aeotec Range Extender Zi).
+category: Zigbee|Router
+quality: production
+source:
+  - path: src/router_status_led_button.c
+include:
+  - path: inc
+    file_list:
+    - path: router_status_led_button.h
+config_file:
+  - path: config/router_status_led_button_config.h
+    file_id: router_status_led_button_config
+provides:
+  - name: router_status_led_button
+requires:
+  - name: simple_button
+  - name: simple_led
+  - name: sleeptimer
+  - name: token_manager
+  - name: zigbee_network_steering
+  - name: zigbee_find_and_bind_target
+  - name: zigbee_identify
+  - name: zigbee_on_off
+template_contribution:
+  - name: zigbee_af_callback
+    value:
+      callback_type: event_init
+      function_name: router_status_led_button_init
+  - name: zigbee_stack_callback
+    value:
+      callback_type: stack_status
+      function_name: router_status_led_button_stack_status_cb

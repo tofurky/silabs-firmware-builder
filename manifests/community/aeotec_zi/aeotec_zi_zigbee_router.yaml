@@ -1,0 +1,90 @@
+name: Aeotec Range Extender Zi Zigbee Router
+device: EFR32MG21A020F768IM32
+base_project: src/zigbee_router
+filename: "{manifest_name}_{sdk_version}"
+sdk: "simplicity_sdk:2026.6.1"
+toolchain: "14.2.1.20241119"
+
+gbl:
+  fw_type: zigbee_router
+  baudrate: 115200
+  compression: lzma
+
+ota:
+  manufacturer_id: 0x1310
+  image_type: 0x0000
+  file_version: 0x00000012
+  header_string: "EBL Z3RangeExtender"
+
+sdk_extension:
+  - id: router_status_led_button
+    vendor: nabucasa
+    version: 1.0.0
+
+config_file:
+  - path: config/zcl/zcl_config.zap
+    file_id: zap_configuration_file_id
+    directory: zcl
+
+add_components:
+  - id: simple_led
+    instance: [status_led]
+  - id: simple_button
+    instance: [reset_button]
+  - id: router_status_led_button
+    vendor: nabucasa
+    package: router_status_led_button
+  - id: zigbee_identify
+  - id: zigbee_on_off
+  - id: zigbee_zll_on_off_server
+  - id: zigbee_zll_identify_server
+  - id: zigbee_ota_bootload
+  - id: zigbee_ota_client
+  - id: zigbee_ota_client_policy
+  - id: zigbee_ota_storage_simple
+  - id: zigbee_ota_storage_simple_eeprom
+
+c_defines:
+  SL_ZIGBEE_AF_PLUGIN_NETWORK_STEERING_RADIO_TX_POWER: 20
+  SL_ZIGBEE_APS_UNICAST_MESSAGE_COUNT: 32
+  SL_ZIGBEE_BINDING_TABLE_SIZE: 32
+  SL_ZIGBEE_BROADCAST_TABLE_SIZE: 64
+  SL_ZIGBEE_MAX_END_DEVICE_CHILDREN: 32
+  SL_ZIGBEE_SOURCE_ROUTE_TABLE_SIZE: 200
+
+  SL_ZIGBEE_CHILD_TABLE_SIZE:
+    type: c_flag
+    value: 32
+
+  SL_ZIGBEE_ROUTE_TABLE_SIZE:
+    type: c_flag
+    value: 250
+
+  SL_IOSTREAM_USART_VCOM_BAUDRATE: 115200
+  SL_IOSTREAM_USART_VCOM_FLOW_CONTROL_TYPE: usartHwFlowControlNone
+
+  SL_IOSTREAM_USART_VCOM_PERIPHERAL: USART0
+  SL_IOSTREAM_USART_VCOM_PERIPHERAL_NO: 0
+
+  SL_IOSTREAM_USART_VCOM_TX_PORT: SL_GPIO_PORT_A
+  SL_IOSTREAM_USART_VCOM_TX_PIN:  5
+  SL_IOSTREAM_USART_VCOM_RX_PORT: SL_GPIO_PORT_A
+  SL_IOSTREAM_USART_VCOM_RX_PIN:  6
+
+  SL_IOSTREAM_USART_VCOM_RX_BUFFER_SIZE: 128
+
+  # Status LED on PB01 (active-low)
+  SL_SIMPLE_LED_STATUS_LED_POLARITY: SL_SIMPLE_LED_POLARITY_ACTIVE_LOW
+  SL_SIMPLE_LED_STATUS_LED_PORT:     SL_GPIO_PORT_B
+  SL_SIMPLE_LED_STATUS_LED_PIN:      1
+
+  # Reset / pairing button on PB00 (active-low with internal pull-up)
+  SL_SIMPLE_BUTTON_RESET_BUTTON_PORT: SL_GPIO_PORT_B
+  SL_SIMPLE_BUTTON_RESET_BUTTON_PIN:  0
+
+  # Zigbee OTA Client & Storage matching stock Gecko Bootloader slot (0x62000..0xB4000)
+  SL_APPLICATION_VERSION: 18
+  SL_ZIGBEE_AF_PLUGIN_OTA_CLIENT_POLICY_IMAGE_TYPE_ID: 0
+  SL_ZIGBEE_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION: 18
+  SL_ZIGBEE_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START: 401408
+  SL_ZIGBEE_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_END: 737280
