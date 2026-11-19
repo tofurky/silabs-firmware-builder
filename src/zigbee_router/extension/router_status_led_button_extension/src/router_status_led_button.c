@@ -39,13 +39,15 @@ typedef enum {
 
 typedef enum {
   BUTTON_ACTION_NONE = 0,
-  BUTTON_ACTION_SHORT_PRESS,
+  BUTTON_ACTION_SINGLE_CLICK,
+  BUTTON_ACTION_DOUBLE_CLICK,
   BUTTON_ACTION_REFRESH_LED,
   BUTTON_ACTION_FACTORY_RESET,
 } router_button_action_t;
 
 static sl_sleeptimer_timer_handle_t led_pattern_timer;
 static sl_sleeptimer_timer_handle_t button_hold_timer;
+static sl_sleeptimer_timer_handle_t button_click_timer;
 
 static sl_zigbee_af_event_t button_action_event;
 static sl_zigbee_af_event_t steering_retry_event;
@@ -57,6 +59,7 @@ static uint32_t breathe_tick_counter = 0;
 static volatile uint32_t button_press_start_ms = 0;
 static volatile bool button_is_pressed = false;
 static volatile bool reset_triggered = false;
+static volatile uint8_t button_click_count = 0;
 static volatile router_button_action_t pending_button_action = BUTTON_ACTION_NONE;
 
 static bool steering_active = false;
@@ -230,10 +233,14 @@ static void button_action_event_handler(sl_zigbee_af_event_t *event)
   CORE_EXIT_CRITICAL();
 
   switch (action) {
-    case BUTTON_ACTION_SHORT_PRESS:
+    case BUTTON_ACTION_SINGLE_CLICK:
       if (sl_zigbee_af_network_state() != SL_ZIGBEE_JOINED_NETWORK) {
         start_network_steering_session();
-      } else {
+      }
+      break;
+
+    case BUTTON_ACTION_DOUBLE_CLICK:
+      if (sl_zigbee_af_network_state() == SL_ZIGBEE_JOINED_NETWORK) {
         bool new_on_off = !read_on_off_attribute();
         sl_zigbee_af_write_server_attribute(ROUTER_STATUS_LED_ENDPOINT,
                                             ZCL_ON_OFF_CLUSTER_ID,
@@ -307,6 +314,23 @@ static void button_hold_timer_cb(sl_sleeptimer_timer_handle_t *handle, void *dat
   }
 }
 
+static void button_click_timer_cb(sl_sleeptimer_timer_handle_t *handle, void *data)
+{
+  (void)handle;
+  (void)data;
+
+  uint8_t clicks = button_click_count;
+  button_click_count = 0;
+
+  if (clicks == 1) {
+    pending_button_action = BUTTON_ACTION_SINGLE_CLICK;
+    sl_zigbee_af_event_set_active(&button_action_event);
+  } else if (clicks == 2) {
+    pending_button_action = BUTTON_ACTION_DOUBLE_CLICK;
+    sl_zigbee_af_event_set_active(&button_action_event);
+  }
+}
+
 void sl_button_on_change(const sl_button_t *handle)
 {
   if (handle != &sl_button_reset_button) {
@@ -317,6 +341,7 @@ void sl_button_on_change(const sl_button_t *handle)
   uint32_t now_ms = sl_sleeptimer_tick_to_ms(sl_sleeptimer_get_tick_count());
 
   if (pressed) {
+    sl_sleeptimer_stop_timer(&button_click_timer);
     button_is_pressed = true;
     reset_triggered = false;
     button_press_start_ms = now_ms;
@@ -336,14 +361,23 @@ void sl_button_on_change(const sl_button_t *handle)
 
     uint32_t held_ms = now_ms - button_press_start_ms;
     if (held_ms >= ROUTER_BUTTON_HOLD_RESET_READY_MS) {
+      button_click_count = 0;
       reset_triggered = true;
       pending_button_action = BUTTON_ACTION_FACTORY_RESET;
+      sl_zigbee_af_event_set_active(&button_action_event);
     } else if (held_ms >= ROUTER_BUTTON_HOLD_SLOW_BLINK_MS) {
+      button_click_count = 0;
       pending_button_action = BUTTON_ACTION_REFRESH_LED;
+      sl_zigbee_af_event_set_active(&button_action_event);
     } else {
-      pending_button_action = BUTTON_ACTION_SHORT_PRESS;
+      button_click_count++;
+      sl_sleeptimer_restart_timer_ms(&button_click_timer,
+                                     ROUTER_BUTTON_MULTICLICK_WINDOW_MS,
+                                     button_click_timer_cb,
+                                     NULL,
+                                     0,
+                                     0);
     }
-    sl_zigbee_af_event_set_active(&button_action_event);
   }
 }
 
