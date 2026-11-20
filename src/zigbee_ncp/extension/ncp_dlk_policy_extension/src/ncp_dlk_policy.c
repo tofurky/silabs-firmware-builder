@@ -42,6 +42,18 @@ sl_status_t sl_zigbee_zdo_dlk_select_negotiation_parameters_callback(
     return SL_STATUS_NOT_FOUND;
   }
 
+  // `newDeviceHandler` clones the wildcard `ZigBeeAlliance09` transient key under
+  // the joiner's exact EUI64 on a legacy/non-DLK join. If a parent R23 router
+  // dual-submits `Update Device` (APS-encrypted + NWK-only) or the joiner retries
+  // within the transient key timeout, reject that cloned well-known key so we
+  // don't erroneously start DLK and strand the joiner in the transient relay table.
+  static const sl_zigbee_sec_man_key_t well_known_key = {
+    .key = { 'Z', 'i', 'g', 'B', 'e', 'e', 'A', 'l', 'l', 'i', 'a', 'n', 'c', 'e', '0', '9' },
+  };
+  if (sl_zigbee_sec_man_compare_key_to_value(&context, &well_known_key)) {
+    return SL_STATUS_NOT_FOUND;
+  }
+
   *selected_secret = DLK_SECRET_ENUM_PRECONFIG_INSTALL_CODE;
   return SL_STATUS_OK;
 }
