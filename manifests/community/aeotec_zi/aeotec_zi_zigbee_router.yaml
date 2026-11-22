@@ -12,7 +12,7 @@ gbl:
 ota:
   manufacturer_id: 0x1310
   image_type: 0x0000
-  file_version: 0x00000012
+  file_version: 0x00000013
   header_string: "EBL Z3RangeExtender"
 
 sdk_extension:
@@ -26,6 +26,9 @@ config_file:
     directory: zcl
 
 remove_components:
+  - id: router_eui64_unique
+    vendor: nabucasa
+    package: router_eui64_unique
   - id: zigbee_core_cli
   - id: zigbee_zcl_cli
   - id: zigbee_green_power_client_cli
@@ -95,8 +98,8 @@ c_defines:
   SL_SIMPLE_BUTTON_RESET_BUTTON_PIN:  0
 
   # Zigbee OTA Client & Storage matching stock Gecko Bootloader slot (0x62000..0xB4000)
-  SL_APPLICATION_VERSION: 18
+  SL_APPLICATION_VERSION: 19
   SL_ZIGBEE_AF_PLUGIN_OTA_CLIENT_POLICY_IMAGE_TYPE_ID: 0
-  SL_ZIGBEE_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION: 18
+  SL_ZIGBEE_AF_PLUGIN_OTA_CLIENT_POLICY_FIRMWARE_VERSION: 19
   SL_ZIGBEE_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_START: 401408
   SL_ZIGBEE_AF_PLUGIN_OTA_STORAGE_SIMPLE_EEPROM_STORAGE_END: 737280

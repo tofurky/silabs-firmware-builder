@@ -410,7 +410,8 @@ void router_status_led_button_init(uint8_t init_level)
   sl_gpio_set_pin_mode(&pc00_gpio, SL_GPIO_MODE_PUSH_PULL, 0);
 #endif
 
-  sl_zigbee_af_event_init(&button_action_event, button_action_event_handler);
+  // Activated from sleeptimer/GPIO ISRs, so it must be an ISR-safe event
+  sl_zigbee_af_isr_event_init(&button_action_event, button_action_event_handler);
   sl_zigbee_af_event_init(&steering_retry_event, steering_retry_event_handler);
   sl_zigbee_af_event_init(&factory_reset_reboot_event, factory_reset_reboot_event_handler);
 
