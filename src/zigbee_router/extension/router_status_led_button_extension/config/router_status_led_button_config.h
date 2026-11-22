@@ -35,6 +35,12 @@
 #define ROUTER_BUTTON_HOLD_FORCE_RESET_MS       12000
 #endif
 
+// <o ROUTER_BUTTON_MULTICLICK_WINDOW_MS> Multi-click timeout window (ms)
+// <i> Default: 300
+#ifndef ROUTER_BUTTON_MULTICLICK_WINDOW_MS
+#define ROUTER_BUTTON_MULTICLICK_WINDOW_MS      300
+#endif
+
 // <o ROUTER_STEERING_MAX_RETRIES> Maximum network steering retries per pairing session
 // <i> Default: 34
 #ifndef ROUTER_STEERING_MAX_RETRIES
