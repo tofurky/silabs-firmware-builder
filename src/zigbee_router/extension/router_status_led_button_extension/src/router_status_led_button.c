@@ -51,6 +51,7 @@ static sl_sleeptimer_timer_handle_t button_click_timer;
 
 static sl_zigbee_af_event_t button_action_event;
 static sl_zigbee_af_event_t steering_retry_event;
+static sl_zigbee_af_event_t factory_reset_reboot_event;
 
 static router_led_pattern_t current_led_pattern = LED_PATTERN_OFF;
 static bool blink_phase_on = false;
@@ -206,6 +207,20 @@ static void start_network_steering_session(void)
   sl_zigbee_app_debug_println("Join network start: 0x%X", status);
 }
 
+static void factory_reset_reboot_event_handler(sl_zigbee_af_event_t *event)
+{
+  (void)event;
+
+  tokTypeStackNodeData nodeData;
+  memset(&nodeData, 0xFF, sizeof(nodeData));
+  halCommonSetToken(TOKEN_STACK_NODE_DATA, &nodeData);
+
+  sl_zigbee_clear_binding_table();
+  sl_zigbee_clear_key_table();
+  sl_zigbee_token_factory_reset(true, true);
+  NVIC_SystemReset();
+}
+
 static void perform_factory_reset(void)
 {
   sl_zigbee_app_debug_println("Reset product");
@@ -217,9 +232,15 @@ static void perform_factory_reset(void)
                                       (uint8_t *)&default_on,
                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 
-  (void)sl_zigbee_leave_network(SL_ZIGBEE_LEAVE_NWK_WITH_NO_OPTION);
-  sl_zigbee_token_factory_reset(true, true);
-  NVIC_SystemReset();
+  set_led_pattern(LED_PATTERN_BREATHE);
+
+  sl_status_t status = sl_zigbee_leave_network(SL_ZIGBEE_LEAVE_NWK_WITH_NO_OPTION);
+  if (status == SL_STATUS_OK) {
+    // Allow the stack leave announcement (2050 ms on routers) to complete before rebooting
+    sl_zigbee_af_event_set_delay_ms(&factory_reset_reboot_event, 2200);
+  } else {
+    sl_zigbee_af_event_set_active(&factory_reset_reboot_event);
+  }
 }
 
 static void button_action_event_handler(sl_zigbee_af_event_t *event)
@@ -392,6 +413,7 @@ void router_status_led_button_init(uint8_t init_level)
 
   sl_zigbee_af_event_init(&button_action_event, button_action_event_handler);
   sl_zigbee_af_event_init(&steering_retry_event, steering_retry_event_handler);
+  sl_zigbee_af_event_init(&factory_reset_reboot_event, factory_reset_reboot_event_handler);
 
   update_led_from_state();
 

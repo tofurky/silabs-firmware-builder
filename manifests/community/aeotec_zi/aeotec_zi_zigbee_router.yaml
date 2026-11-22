@@ -79,6 +79,9 @@ c_defines:
   SL_SIMPLE_LED_STATUS_LED_PIN:      1
 
   # Reset / pairing button on PB00 (active-low with internal pull-up)
+  SL_SIMPLE_BUTTON_GPIO_MODE:         SL_GPIO_MODE_INPUT_PULL
+  SL_SIMPLE_BUTTON_GPIO_DOUT:         1
+  SL_SIMPLE_BUTTON_POLARITY:          0
   SL_SIMPLE_BUTTON_RESET_BUTTON_PORT: SL_GPIO_PORT_B
   SL_SIMPLE_BUTTON_RESET_BUTTON_PIN:  0
 
