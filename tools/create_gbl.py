@@ -254,7 +254,9 @@ def create_ota(gbl_path: pathlib.Path, ota_metadata: dict[str, Any]) -> pathlib.
     sub_element_header_len = 6
     total_size = header_len + sub_element_header_len + len(gbl_bytes)
 
-    header_str = ota_metadata.get("header_string", "").encode("ascii")[:32].ljust(32, b"\x00")
+    header_str = (
+        ota_metadata.get("header_string", "").encode("ascii")[:32].ljust(32, b"\x00")
+    )
     ota_header = struct.pack(
         "<IHHHHHIH32sIHI",
         0x0BEEF11E,  # OTA upgrade file identifier
