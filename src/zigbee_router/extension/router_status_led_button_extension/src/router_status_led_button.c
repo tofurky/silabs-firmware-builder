@@ -10,7 +10,6 @@
 
 #include "app/framework/include/af.h"
 #include "network-steering.h"
-#include "find-and-bind-target.h"
 #include "stack-info.h"
 #include "sl_token_api.h"
 

@@ -8,7 +8,6 @@ toolchain: "14.2.1.20241119"
 gbl:
   fw_type: zigbee_router
   baudrate: 115200
-  compression: lzma
 
 ota:
   manufacturer_id: 0x1310
@@ -26,6 +25,18 @@ config_file:
     file_id: zap_configuration_file_id
     directory: zcl
 
+remove_components:
+  - id: zigbee_core_cli
+  - id: zigbee_zcl_cli
+  - id: zigbee_green_power_client_cli
+  - id: zigbee_find_and_bind_target
+  - id: zigbee_groups_server
+  - id: zigbee_interpan
+  - id: zigbee_poll_control_client
+  - id: zigbee_zll
+  - id: zigbee_zll_commissioning_common
+  - id: zigbee_zll_commissioning_server
+
 add_components:
   - id: simple_led
     instance: [status_led]
@@ -36,8 +47,6 @@ add_components:
     package: router_status_led_button
   - id: zigbee_identify
   - id: zigbee_on_off
-  - id: zigbee_zll_on_off_server
-  - id: zigbee_zll_identify_server
   - id: zigbee_ota_bootload
   - id: zigbee_ota_client
   - id: zigbee_ota_client_policy

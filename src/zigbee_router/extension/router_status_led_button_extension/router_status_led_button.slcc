@@ -23,7 +23,6 @@ requires:
   - name: sleeptimer
   - name: token_manager
   - name: zigbee_network_steering
-  - name: zigbee_find_and_bind_target
   - name: zigbee_identify
   - name: zigbee_on_off
 template_contribution:
