@@ -1,3 +1,6 @@
+# 9.1.2.0
+Built with EmberZNet 9.1.2 from Simplicity SDK 2026.6.2.
+
 # 9.1.1.1
 Fix Zigbee 4.0 routers failing to join directly through the coordinator.
 

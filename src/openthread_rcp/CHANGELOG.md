@@ -1,3 +1,6 @@
+# SL-OPENTHREAD/3.1.2.0_GitHub-fb274efe6
+Built with OpenThread 3.1.2 from Simplicity SDK 2026.6.2.
+
 # SL-OPENTHREAD/3.1.1.0_GitHub-fb274efe6
 Built with OpenThread 3.1.0 from Simplicity SDK 2026.6.1, adding automatic recovery from firmware stalls and fixing serial link lockups.
 
